@@ -1,18 +1,18 @@
 steps:
   # Install dependencies
-  - name: python
+  - name: python:3.8
     id: 'Install requirements'
     entrypoint: pip
     args: ["install", "-r", "requirements.txt", "--user"]
 
   # Lint
-  - name: python
+  - name: python:3.8
     id: 'Lint'
     entrypoint: python
     args: ["-m", "pylint", "--disable=R,C", "webapp/app.py"]
 
   # Run unit tests
-  - name: python
+  - name: python:3.8
     id: 'Test'
     entrypoint: python
     args: ["-m", "pytest", "-vv", "--junitxml=${SHORT_SHA}_test_log.xml"]
