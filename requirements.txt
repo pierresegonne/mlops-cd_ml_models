@@ -1,5 +1,7 @@
 Flask==2.0.3
 onnxruntime==1.10.0
+pylint==2.12.2
+pytest==7.1.1
 simpletransformers==0.63.4
 torch==1.11.0
 transformers==4.17.0

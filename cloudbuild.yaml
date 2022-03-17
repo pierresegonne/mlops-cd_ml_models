@@ -1,0 +1,52 @@
+steps:
+  # Install dependencies
+  - name: python
+    id: 'Install requirements'
+    entrypoint: pip
+    args: ["install", "-r", "requirements.txt", "--user"]
+
+  # Lint
+  - name: python
+    id: 'Lint'
+    entrypoint: python
+    args: ["-m", "pylint", "--disable=R,C", "webapp/app.py"]
+
+  # Run unit tests
+  - name: python
+    id: 'Test'
+    entrypoint: python
+    args: ["-m", "pytest", "-vv", "--junitxml=${SHORT_SHA}_test_log.xml"]
+
+  # Pull stored ONNX model
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
+    id: 'Pull RoBERTa model'
+    args: ['gcloud', 'storage', 'download', '--quiet', '--no-progress', '--output', 'webapp/roberta-sequence-classification-9.onnx', 'gs://mlops_cd/roberta-sequence-classification-9.onnx']
+
+  # Docker Build
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'Build'
+    args: ['build', '--no-cache', '-t',
+           'eu.gcr.io/${PROJECT_ID}/${REPO_NAME}:${SHORT_SHA}', '.', '-f', 'Dockerfile']
+
+  # Docker push to Google Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'Push'
+    args: ['push',  'eu.gcr.io/${PROJECT_ID}/${REPO_NAME}:${SHORT_SHA}']
+
+  # Deploy to cloud run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
+    id: 'Deploy'
+    args: ['gcloud', 'run', 'services', 'update', '${REPO_NAME}',
+           '--platform=managed', '--image=eu.gcr.io/${PROJECT_ID}/${REPO_NAME}:${SHORT_SHA}',
+           '--region=europe-west1']
+
+# Save test logs to Google Cloud Storage
+artifacts:
+  objects:
+    location: gs://mlops_cd/build-logs/
+    paths:
+      - ${SHORT_SHA}_test_log.xml
+
+# Store images in Google Artifact Registry
+images:
+  - eu.gcr.io/${PROJECT_ID}/${REPO_NAME}:${SHORT_SHA}
