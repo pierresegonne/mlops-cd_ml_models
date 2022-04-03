@@ -26,18 +26,18 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     id: 'Build'
     args: ['build', '--no-cache', '-t',
-           'eu.gcr.io/${PROJECT_ID}/${REPO_NAME}:${SHORT_SHA}', '.', '-f', 'Dockerfile']
+           'eu.gcr.io/${PROJECT_ID}/mlops-cd:${SHORT_SHA}', '.', '-f', 'Dockerfile']
 
   # Docker push to Google Artifact Registry
   - name: 'gcr.io/cloud-builders/docker'
     id: 'Push'
-    args: ['push',  'eu.gcr.io/${PROJECT_ID}/${REPO_NAME}:${SHORT_SHA}']
+    args: ['push',  'eu.gcr.io/${PROJECT_ID}/mlops-cd:${SHORT_SHA}']
 
   # Deploy to cloud run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
     id: 'Deploy'
-    args: ['gcloud', 'run', 'services', 'update', '${REPO_NAME}',
-           '--platform=managed', '--image=eu.gcr.io/${PROJECT_ID}/${REPO_NAME}:${SHORT_SHA}',
+    args: ['gcloud', 'run', 'services', 'update', 'mlops-cd',
+           '--platform=managed', '--image=eu.gcr.io/${PROJECT_ID}/mlops-cd:${SHORT_SHA}',
            '--region=europe-west1']
 
 # Save test logs to Google Cloud Storage
@@ -49,6 +49,6 @@ artifacts:
 
 # Store images in Google Artifact Registry
 images:
-  - eu.gcr.io/${PROJECT_ID}/${REPO_NAME}:${SHORT_SHA}
+  - eu.gcr.io/${PROJECT_ID}/mlops-cd:${SHORT_SHA}
 
 timeout: 1000s
