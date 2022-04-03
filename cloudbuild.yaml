@@ -51,4 +51,4 @@ artifacts:
 images:
   - eu.gcr.io/${PROJECT_ID}/${REPO_NAME}:${SHORT_SHA}
 
-timeout: 860s
+timeout: 1000s
