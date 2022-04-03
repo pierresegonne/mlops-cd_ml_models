@@ -20,7 +20,7 @@ steps:
   # Pull stored ONNX model
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
     id: 'Pull RoBERTa model'
-    args: ['gcloud', 'storage', 'download', '--quiet', '--no-progress', '--output', 'webapp/roberta-sequence-classification-9.onnx', 'gs://mlops_cd/roberta-sequence-classification-9.onnx']
+    args: ['gsutil', 'cp', 'gs://mlops_cd/roberta-sequence-classification-9.onnx', 'webapp/']
 
   # Docker Build
   - name: 'gcr.io/cloud-builders/docker'
