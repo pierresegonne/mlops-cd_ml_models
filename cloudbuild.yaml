@@ -18,9 +18,9 @@ steps:
     args: ["-m", "pytest", "-vv", "--junitxml=${SHORT_SHA}_test_log.xml"]
 
   # Pull stored ONNX model
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
+  - name: 'gcr.io/cloud-builders/gsutil'
     id: 'Pull RoBERTa model'
-    args: ['gsutil', 'cp', 'gs://mlops_cd/roberta-sequence-classification-9.onnx', 'webapp/']
+    args: ['cp', 'gs://mlops_cd/roberta-sequence-classification-9.onnx', 'webapp/']
 
   # Docker Build
   - name: 'gcr.io/cloud-builders/docker'
